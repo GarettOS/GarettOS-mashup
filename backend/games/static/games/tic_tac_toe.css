@@ -1,0 +1,86 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#wrapper {
+    min-height: 100%; 
+    background-color: black;
+}
+
+h1 {
+    font-family: monospace;
+    font-size: 10em;
+    animation: color-change 0.5s infinite;
+}
+
+@keyframes color-change {
+    0% { color: red; }
+    50% { color: blue; }
+    100% { color: yellow; }
+  }
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.message {
+    font-size: 1.2em;
+    color: white;
+}
+
+#tic-tac-toe-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+}
+
+.cell {
+    border: 1px solid blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color:white;
+    font-size: 3em;
+}
+
+.cell:hover {
+    background-color:darkblue
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 10px;
+    font-size: 1em;
+    background-color: blue;
+    color: orange
+}
+
+#back-button {
+    margin-left: 20px;
+    background-color: blue;
+    color: orange
+}
+
+.audio-controls {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audio-controls button {
+    margin-top: 20px;
+    padding: 10px 10px;
+    font-size: 1em;
+}
+
+.audio-controls input[type="range"] {
+    width: 100px;
+}
