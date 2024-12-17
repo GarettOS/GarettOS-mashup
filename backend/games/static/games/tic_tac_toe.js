@@ -1,7 +1,7 @@
 class TicTacToe {
     constructor() {
         this.cells = document.querySelectorAll('.cell');
-        this.resetButton = document.querySelector('button[onclick="resetGame()"]');
+        this.resetButton = document.getElementById('reset-button');
         this.messageDisplay = document.querySelector('.message');
         this.currentPlayer = 'X';
         this.board = Array(9).fill('');
@@ -12,6 +12,7 @@ class TicTacToe {
             [0, 4, 8], [2, 4, 6]             // Diagonals
         ];
 
+        this.resetButton.addEventListener('click', () => this.resetGame());
         this.initialize();
     }
 
@@ -20,7 +21,6 @@ class TicTacToe {
         this.cells.forEach(cell => {
             cell.addEventListener('click', (e) => this.handleCellClick(e));
         });
-        this.resetButton.addEventListener('click', () => this.resetGame());
     }
 
     updateMessage(message) {
@@ -31,16 +31,20 @@ class TicTacToe {
         const clickedCell = event.target;
         const cellIndex = parseInt(clickedCell.getAttribute('data-index'));
 
-        // Ignore if cell is already filled
         if (this.board[cellIndex]) return;
 
-        // Update board state and UI
         this.board[cellIndex] = this.currentPlayer;
         clickedCell.textContent = this.currentPlayer;
+        clickedCell.classList.add(this.currentPlayer.toLowerCase());
+        
+        clickedCell.style.transform = 'scale(0)';
+        setTimeout(() => {
+            clickedCell.style.transform = 'scale(1)';
+        }, 50);
 
-        // Check game status
         if (this.checkWinner()) {
             this.updateMessage(`Player ${this.currentPlayer} wins!`);
+            this.highlightWinningCells();
             this.endGame();
             return;
         }
@@ -51,7 +55,6 @@ class TicTacToe {
             return;
         }
 
-        // Switch players
         this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
         this.updateMessage(`Player ${this.currentPlayer}'s turn`);
     }
@@ -79,13 +82,55 @@ class TicTacToe {
         this.currentPlayer = 'X';
         this.cells.forEach(cell => {
             cell.textContent = '';
+            cell.className = 'cell';
+            cell.style.transform = '';
             cell.addEventListener('click', (e) => this.handleCellClick(e));
         });
         this.updateMessage(`Player ${this.currentPlayer}'s turn`);
     }
+
+    highlightWinningCells() {
+        const winningCombo = this.getWinningCombo();
+        if (winningCombo) {
+            winningCombo.forEach(index => {
+                const cell = document.querySelector(`[data-index="${index}"]`);
+                cell.classList.add('winner');
+            });
+        }
+    }
+
+    getWinningCombo() {
+        for (let combo of this.winningCombinations) {
+            if (combo.every(index => this.board[index] === this.currentPlayer)) {
+                return combo;
+            }
+        }
+        return null;
+    }
 }
 
-// Initialize game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.game = new TicTacToe();
 });
+
+window.resetGame = function() {
+    // Reset the board array
+    board = [
+        '', '', '',
+        '', '', '',
+        '', '', ''
+    ];
+    
+    // Reset current player
+    currPlayer = 'X';
+    
+    // Clear all cells
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.textContent = '';
+        cell.className = 'cell';
+    });
+    
+    // Reset message
+    document.querySelector('.message').textContent = `Player ${currPlayer} turn`;
+}

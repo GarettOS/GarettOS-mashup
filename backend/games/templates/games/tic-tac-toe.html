@@ -36,11 +36,11 @@
             </div>
 
             <!-- Reset Button -->
-            <button id="reset-button">Reset Game</button>
+            <button onclick="resetGame()">New Game</button>
 
             <!-- Audio Controller -->
             <div class="audio-controls">
-                <button onclick="toggleAudio()">Play/Pause Sound</button>
+                <button onclick="toggleAudio()">🔊 Toggle Sound</button>
                 <input type="range" id="volume-control" min="0" max="1" step="0.01" onchange="changeVolume(this.value)" value="1">
             </div>
 
