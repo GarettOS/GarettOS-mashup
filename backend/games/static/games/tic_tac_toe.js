@@ -1,102 +1,91 @@
-// Logic for tic tac toe game
-document.addEventListener('DOMContentLoaded', ()=> {
-    // Get html elements
-    const cells = document.querySelectorAll('.cell');
-    const resetButton = document.querySelector('button[onclick="resetGame()"]');
-    const gameContainer = document.querySelector('.game-container');
-    const messageDisplay = document.querySelector('.message');
+class TicTacToe {
+    constructor() {
+        this.cells = document.querySelectorAll('.cell');
+        this.resetButton = document.querySelector('button[onclick="resetGame()"]');
+        this.messageDisplay = document.querySelector('.message');
+        this.currentPlayer = 'X';
+        this.board = Array(9).fill('');
+        
+        this.winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
 
-    // 3x3 board
-    let board = [
-        '', '', '',
-        '', '', '',
-        '', '', '' 
-    ];
-
-    // X starts first
-    let currPlayer = 'X';
-    winConditions = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-    ];
-
-    messageDisplay.textContent = `Player ${currPlayer} turn`;
-
-    // Add a listener for each cell to wait for clicks
-    cells.forEach(cell => {
-        cell.addEventListener('click', handleCellClick);
-    })
-
-    function isBoardFull() {
-        return board.every(cell => cell !== '');
+        this.initialize();
     }
 
-    function checkWin() {
-        for (let i = 0; i < winConditions.length; i++) {
-            if (board[winConditions[i][0]] == currPlayer 
-                && board[winConditions[i][1]] == currPlayer
-                && board[winConditions[i][2]] == currPlayer) {
-                    return true
-                }
-        }
-        return false
-    }
-
-    function endGame() {
-        // Remove click listeners
-        cells.forEach(cell => cell.removeEventListener('click', handleCellClick));
-    }
-
-    // When a button is clicked
-    function handleCellClick(event) {
-        // Get the cell that was clicked
-        const clickedCell = event.target
-        const cellIndex = parseInt(clickedCell.getAttribute('data-index'));
-        if (board[cellIndex] != '') {
-            return // cell is already full
-        }
-
-        board[cellIndex] = currPlayer;
-        clickedCell.textContent = currPlayer;
-
-        if (checkWin()) {
-            messageDisplay.textContent = `Player ${currPlayer} wins!`;
-            endGame();
-            return;
-        }
-
-        if (isBoardFull()) {
-            messageDisplay.textContent = "It's a draw!";
-            endGame();
-            return;
-        }
-
-        // Now its the next players turn
-        if (currPlayer == 'X') {
-            currPlayer = 'O';
-        } else {
-            currPlayer = 'X';
-        }
-        messageDisplay.textContent = `Player ${currPlayer} turn`;
-    }
-
-    function resetGame() {
-        // Reset the board array and clear the cell contents
-        board = ['', '', '', '', '', '', '', '', ''];
-        currPlayer = 'X';
-        cells.forEach(cell => {
-            cell.textContent = '';
-            cell.addEventListener('click', handleCellClick); // Re-add listeners
+    initialize() {
+        this.updateMessage(`Player ${this.currentPlayer}'s turn`);
+        this.cells.forEach(cell => {
+            cell.addEventListener('click', (e) => this.handleCellClick(e));
         });
-        messageDisplay.textContent = ''; // Clear any messages
+        this.resetButton.addEventListener('click', () => this.resetGame());
     }
 
-    // Attach the resetGame function to the button
-    resetButton.addEventListener('click', resetGame);
-})
+    updateMessage(message) {
+        this.messageDisplay.textContent = message;
+    }
+
+    handleCellClick(event) {
+        const clickedCell = event.target;
+        const cellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+        // Ignore if cell is already filled
+        if (this.board[cellIndex]) return;
+
+        // Update board state and UI
+        this.board[cellIndex] = this.currentPlayer;
+        clickedCell.textContent = this.currentPlayer;
+
+        // Check game status
+        if (this.checkWinner()) {
+            this.updateMessage(`Player ${this.currentPlayer} wins!`);
+            this.endGame();
+            return;
+        }
+
+        if (this.isBoardFull()) {
+            this.updateMessage("It's a draw!");
+            this.endGame();
+            return;
+        }
+
+        // Switch players
+        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+        this.updateMessage(`Player ${this.currentPlayer}'s turn`);
+    }
+
+    checkWinner() {
+        return this.winningCombinations.some(combination => {
+            return combination.every(index => {
+                return this.board[index] === this.currentPlayer;
+            });
+        });
+    }
+
+    isBoardFull() {
+        return this.board.every(cell => cell !== '');
+    }
+
+    endGame() {
+        this.cells.forEach(cell => {
+            cell.removeEventListener('click', this.handleCellClick);
+        });
+    }
+
+    resetGame() {
+        this.board = Array(9).fill('');
+        this.currentPlayer = 'X';
+        this.cells.forEach(cell => {
+            cell.textContent = '';
+            cell.addEventListener('click', (e) => this.handleCellClick(e));
+        });
+        this.updateMessage(`Player ${this.currentPlayer}'s turn`);
+    }
+}
+
+// Initialize game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.game = new TicTacToe();
+});
